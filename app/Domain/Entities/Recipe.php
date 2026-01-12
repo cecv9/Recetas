@@ -111,10 +111,10 @@ class Recipe {
 
   
 
-   public function getFechaCreacion(): ?DateTimeImmutable
-{
-    return $this->fechaCreacion;
-}
+    public function getFechaCreacion(): ?DateTimeImmutable
+    {
+     return $this->fechaCreacion;
+    }
 
 
     // Métodos de dominio (reemplazan setters con validación)
@@ -135,7 +135,7 @@ class Recipe {
         $this->tipoCocinaId = $tipoCocinaId;
     }
 
-  public function cambiarIngredientes(IngredientesRecipe $nuevoIngredientes): void
+    public function cambiarIngredientes(IngredientesRecipe $nuevoIngredientes): void
     {
         if($this->ingredientes->equals($nuevoIngredientes)) return;
         $this->ingredientes = $nuevoIngredientes;
@@ -143,7 +143,8 @@ class Recipe {
 
     public function cambiarTiempoPreparacion(TiempoPreparacionRecipe $nuevoTiempoPreparacion): void
     
-    {   if($this->tiempoPreparacion->equals($nuevoTiempoPreparacion)) return;
+    {   
+        if($this->tiempoPreparacion->equals($nuevoTiempoPreparacion)) return;
         $this->tiempoPreparacion = $nuevoTiempoPreparacion;
     }
 
