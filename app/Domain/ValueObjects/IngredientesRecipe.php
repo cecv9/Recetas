@@ -45,8 +45,8 @@ final readonly class IngredientesRecipe
         }
 
         // Normalizar saltos de línea (ahora seguro porque ya validamos UTF-8)
-        $normalizados = str_replace(["\r\n", "\r"], "\n", $ingredientes);
-        $normalizados = trim($normalizados);
+        $normalizados = str_replace(["\r\n", "\r"], "\n", $ingredientes); // Elimina retornos de carro
+        $normalizados = trim($normalizados);                               // Elimina espacios al inicio/final
 
         if ($normalizados === '') {
             throw new InvalidArgumentException("Los ingredientes no pueden estar vacíos");

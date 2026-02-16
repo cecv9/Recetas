@@ -33,7 +33,16 @@ class Recipe {
 
 
 
-    public function __construct(int $autorId,TituloRecipe $titulo,int $tipoCocinaId, IngredientesRecipe  $ingredientes,TiempoPreparacionRecipe $tiempoPreparacion, Dificultad $dificultad,?DateTimeImmutable $fechaCreacion=null,?int $id=null,bool $activo = true )
+    public function __construct(
+        int $autorId,
+        TituloRecipe $titulo,
+        int $tipoCocinaId, 
+        IngredientesRecipe  $ingredientes,
+        TiempoPreparacionRecipe $tiempoPreparacion, 
+        Dificultad $dificultad,
+        ?DateTimeImmutable $fechaCreacion=null,
+        ?int $id=null,
+        bool $activo = true )
     {
        
      
@@ -153,6 +162,7 @@ class Recipe {
     {
     $this->dificultad = $dificultad;  // El tipo ya lo protege
     }
+
 
     // Métodos de dominio para activo (ya estaban bien)
    public function isActivo(): bool
