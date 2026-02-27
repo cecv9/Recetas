@@ -8,6 +8,7 @@ use App\Domain\Enums\Dificultad;
 use App\Domain\ValueObjects\IngredientesRecipe;
 use App\Domain\ValueObjects\TiempoPreparacionRecipe;
 use App\Domain\ValueObjects\TituloRecipe;
+use App\Domain\Contracts\ClockInterface;
 
 use DateTimeImmutable;
 
@@ -31,21 +32,30 @@ class Recipe {
 
     private ?DateTimeImmutable $fechaCreacion;
 
-
+    private readonly ClockInterface $clock;
 
     public function __construct(
+        ClockInterface $clock,        // CAMBIO #1: Clock es OBLIGATORIO y va PRIMERO
+                                       // Sin valor por defecto = se DEBE pasar siempre
         int $autorId,
         TituloRecipe $titulo,
         int $tipoCocinaId, 
         IngredientesRecipe  $ingredientes,
         TiempoPreparacionRecipe $tiempoPreparacion, 
         Dificultad $dificultad,
-        ?DateTimeImmutable $fechaCreacion=null,
-        ?int $id=null,
-        bool $activo = true )
+        ?int $id=null,                // CAMBIO #2: Eliminado el parámetro $fechaCreacion
+                                       // El backend SIEMPRE genera la fecha
+        bool $activo = true 
+    )
     {
-       
-     
+        $this->clock = $clock;        // CAMBIO #3: Asignamos el clock a la propiedad
+                                       // Sin esto, $this->clock->now() daría error
+
+        $now = $this->clock->now();   // CAMBIO #4: Obtenemos fecha del clock INYECTADO
+                                       // NO usamos new DateTimeImmutable() directamente
+                                       // NO usamos funciones externas como now() de Symfony
+
+        // Validaciones de IDs
         if($autorId <=0){
             throw new \InvalidArgumentException("El ID del autor debe ser mayor a cero");
         }
@@ -55,11 +65,10 @@ class Recipe {
         if($id !== null && $id <=0){
             throw new \InvalidArgumentException("El ID de la receta debe ser mayor a cero");
         }
-       
-        if($fechaCreacion !== null && $fechaCreacion > new DateTimeImmutable()){
-            throw new \InvalidArgumentException("La fecha de creacion no puede ser futura");
-        }
-    
+
+        // CAMBIO #5: ELIMINADA la validación de "fecha futura"
+        // Ya NO aceptamos fecha externa, asi que no hay nada que validar
+        // El problema de coordinación de tiempos DESAPARECE
 
         $this->id=$id;
 
@@ -77,9 +86,10 @@ class Recipe {
 
         $this->activo=$activo;
 
-        $this->fechaCreacion = $fechaCreacion ?? new DateTimeImmutable();
-
-        
+        $this->fechaCreacion = $now;  // CAMBIO #6: ASIGNACIÓN SIMPLE
+                                       // El backend es el JEFE de la fecha
+                                       // Una sola línea, sin "??" ni condiciones
+                                       // $now ya tiene el valor del clock
     }
 
    // Getters (sin cambios)
@@ -118,13 +128,10 @@ class Recipe {
         return $this->dificultad;
     }
 
-  
-
     public function getFechaCreacion(): ?DateTimeImmutable
     {
      return $this->fechaCreacion;
     }
-
 
     // Métodos de dominio (reemplazan setters con validación)
     public function cambiarTitulo(TituloRecipe $nuevotitulo): void
@@ -157,15 +164,13 @@ class Recipe {
         $this->tiempoPreparacion = $nuevoTiempoPreparacion;
     }
 
-    // Versión corregida
     public function cambiarDificultad(Dificultad $dificultad): void
     {
-    $this->dificultad = $dificultad;  // El tipo ya lo protege
+    $this->dificultad = $dificultad;
     }
 
 
-    // Métodos de dominio para activo (ya estaban bien)
-   public function isActivo(): bool
+    public function isActivo(): bool
     {
         return $this->activo;
     }
@@ -181,4 +186,3 @@ class Recipe {
     }
 
 }
-
